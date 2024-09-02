@@ -2,7 +2,131 @@
 
 using namespace std;
 
+#define MAXSIDE 25
+#define MAXMINES 99
+#define MOVESIZE 526 // (25 * 25 - 99)
+
 int SIZE, MINES;
+
+bool isValid(int row, int col)
+{
+    return (row >= 0) && (row < SIZE) && (col >= 0) && (col < SIZE);
+}
+
+class Board
+{
+public:
+    char **board;
+    Board()
+    {
+        board = new char *[MAXSIDE + 1];
+        for (int i = 0; i <= MAXSIDE; ++i)
+        {
+            board[i] = new char[MAXSIDE + 1];
+            for (int j = 0; j <= MAXSIDE; ++j)
+                board[i][j] = '-';
+        }
+    }
+
+    bool isMine(int row, int col)
+    {
+        if (board[row][col] == '*')
+            return true;
+        else
+            return false;
+    }
+
+    void makeMove(int *x, int *y)
+    {
+        cout << "Enter move (row, column):    ";
+        int X, Y;
+        cin >> X >> Y;
+        *x = X;
+        *y = Y;
+        return;
+    }
+
+    void printBoard()
+    {
+        int i, j;
+        cout << "    ";
+        for (i = 0; i < SIZE; i++)
+            cout << i << " ";
+        cout << '\n';
+        for (i = 0; i < SIZE; i++)
+        {
+            cout << i << " ";
+            for (j = 0; j < SIZE; j++)
+                cout << board[i][j] << " ";
+            cout << '\n';
+        }
+        return;
+    }
+
+    int countAdjacentMines(int row, int col, int mines[][2])
+    {
+        int i;
+        int count = 0;
+
+        int dx[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
+        int dy[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
+
+        for (int d = 0; d < 8; d++)
+        {
+            int newRow = row + dx[d];
+            int newCol = col + dy[d];
+
+            if (isValid(newRow, newCol) == true)
+            {
+                if (isMine(newRow, newCol) == true)
+                    count++;
+            }
+        }
+        return (count);
+    }
+
+    void placeMines(int mines[][2])
+    {
+        bool mark[MAXSIDE * MAXSIDE];
+
+        memset(mark, false, sizeof(mark));
+
+        for (int i = 0; i < MINES;)
+        {
+            int random = rand() % (SIZE * SIZE);
+            int x = random / SIZE;
+            int y = random % SIZE;
+
+            if (mark[random] == false)
+            {
+                mines[i][0] = x;
+                mines[i][1] = y;
+
+                board[mines[i][0]][mines[i][1]] = '*';
+                mark[random] = true;
+                i++;
+            }
+        }
+        return;
+    }
+
+    void replaceMine(int row, int col)
+    {
+        for (int i = 0; i < SIZE; i++)
+        {
+            for (int j = 0; j < SIZE; j++)
+            {
+                if (board[i][j] != '*')
+                {
+                    board[i][j] = '*';
+                    board[row][col] = '-';
+                    return;
+                }
+            }
+        }
+        return;
+    }
+};
 
 void choseDifficulty()
 {
