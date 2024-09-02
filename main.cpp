@@ -218,7 +218,7 @@ public:
     }
 };
 
-void choseDifficulty()
+void chooseDifficulty()
 {
     int level;
 
@@ -247,6 +247,11 @@ void choseDifficulty()
 
 int main()
 {
+    Board myBoard, realBoard;
 
+    Game *game = new Game();
+    chooseDifficulty();
+
+    game->playMinesweeper(myBoard, realBoard);
     return 0;
 }
