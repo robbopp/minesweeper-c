@@ -128,6 +128,96 @@ public:
     }
 };
 
+class Game
+{
+public:
+    bool playMinesweeperUtil(Board &myBoard,
+                             Board &realBoard,
+                             int mines[][2], int row,
+                             int col, int *movesLeft)
+    {
+        if (myBoard.board[row][col] != '-')
+            return (false);
+
+        int i, j;
+
+        if (realBoard.board[row][col] == '*')
+        {
+            myBoard.board[row][col] = '*';
+            for (i = 0; i < MINES; i++)
+                myBoard.board[mines[i][0]][mines[i][1]] = '*';
+
+            myBoard.printBoard();
+            cout << "You lost!" << '\n';
+            return (true);
+        }
+        else
+        {
+            int count = realBoard.countAdjacentMines(
+                row, col, mines);
+            (*movesLeft)--;
+
+            myBoard.board[row][col] = count + '0';
+
+            if (!count)
+            {
+                int dx[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
+                int dy[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
+
+                for (int d = 0; d < 8; d++)
+                {
+                    int newRow = row + dx[d];
+                    int newCol = col + dy[d];
+
+                    if (isValid(newRow, newCol) == true)
+                    {
+                        if (realBoard.isMine(newRow, newCol) == false)
+                            playMinesweeperUtil(
+                                myBoard, realBoard, mines,
+                                newRow, newCol, movesLeft);
+                    }
+                }
+            }
+            return (false);
+        }
+    }
+
+    void playMinesweeper(Board &realBoard, Board &myBoard)
+    {
+        bool gameOver = false;
+
+        int movesLeft = SIZE * SIZE - MINES, x, y;
+        int mines[MAXMINES][2];
+        realBoard.placeMines(mines);
+        int currentMoveIndex = 0;
+        while (gameOver == false)
+        {
+            cout << "Current status of board: " << '\n';
+            myBoard.printBoard();
+            myBoard.makeMove(&x, &y);
+
+            if (currentMoveIndex == 0)
+            {
+                if (realBoard.isMine(x, y) == true)
+                    realBoard.replaceMine(x, y);
+            }
+
+            currentMoveIndex++;
+
+            gameOver = playMinesweeperUtil(
+                myBoard, realBoard, mines, x, y,
+                &movesLeft);
+
+            if ((gameOver == false) && (movesLeft == 0))
+            {
+                cout << "You won!" << '\n';
+                gameOver = true;
+            }
+        }
+        return;
+    }
+};
+
 void choseDifficulty()
 {
     int level;
